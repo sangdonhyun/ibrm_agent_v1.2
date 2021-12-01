@@ -1,0 +1,30 @@
+common.py : 공통 메서드 정리
+
+fbrm_nfs.py : Server 의 NFS 상태 정검 및 용량 전송
+fbrm_ora_get.py : Oracle 용량 전송
+socketClient.py : log  파일 iBRM Server 로 전송
+
+fbrm_rman_get.py : rman 정보 수집 모듈 삭제 또는 재개발 요망
+fbrm_rman_get_control.py : rman 작업 control 삭제 또는 재개발 요망
+fbrm_rman_progress.py : rman 작업 수행 내역 삭제 또는 재개발 요망
+
+
+ibrm_daemon_socket.py : main socket process sh ./ibrm_start.sh 로 수행
+ibrm_daemon_socket_send.py : main socket process --> ibrm Server 로 통신 수행 모듈
+job_submit.py : shell script 수행 모듈
+
+job_monitor.py : 수행 한 작업의 상태 모니터
+job_monitor_ndb.py : oracle 작업이 아닌 shell script 의 상태 모니터
+
+
+v_rman_control.py : rman 상태 수집 모듈
+v_rman_cx_oracle : rman 상태 수집 을 cx_Oracle lib 를 사용하여 수집
+v_rman_today : today rman 의 백업 상태
+
+log_clear.py : config.cfg 의 로그 보전기간 이 지난 로그 삭제
+
+shell_control.py : backup shell script list,detail 보기
+
+fs_nfs.py : socket 통신용 nfs 상태 모니터
+
+

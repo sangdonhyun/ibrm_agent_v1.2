@@ -1,0 +1,7 @@
+/u02/oradata/UPGR
+
+alter system set control_files='path1, path2, path3', scope=spfile ;
+
+
+alter system set control_files='/u02/oradata/UPGR/control01.ctl,/u02/oradata/UPGR/control02.ctl';
+
