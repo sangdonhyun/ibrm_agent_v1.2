@@ -1,7 +1,9 @@
-#!/bin/sh
-echo `netstat -an | grep 53001`
-export PATH=/iBRM/ibrm_agent_v1.2/python27/bin:$PATH
-echo $PATH
-if [[ $(id -u) -ne 0 ]] ; then echo "Please run as root" ; exit 1 ; fi
-which pythonk
+. /product/Fleta_Workspace/ibrm_agent/Profile
+#if [[ $(id -u) -ne 0 ]] ; then echo 'Please run as root' ; exit 1 ; fi
+export PATH=/product/Fleta_Workspace/ibrm_agent_ora/python27/bin:$PATH
+
+echo `pwd`
+echo `which python`
+cd /product/Fleta_Workspace/ibrm_agent_ora
+
 python ./ibrm_menu.py

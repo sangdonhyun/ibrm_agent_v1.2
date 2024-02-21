@@ -1,13 +1,3 @@
-"""
-* *******************************************************
-* Copyright (c) Fleta Communications, Inc. 2020. All Rights Reserved.
-* *******************************************************
-* create date :
-* modipy date : 2021-12-01
-* python version : 2.7
-"""
-__author__ = 'TODO: muse@fletacom.com'
-__ibrm_agent_version__ = 'TODO: v1.2'
 import os
 import ConfigParser
 import glob
@@ -30,14 +20,25 @@ class shell_contorl():
         return cfg
 
 
-    def shell_detail(self,db_name,shell_name,s_path):
-        if s_path == '':
-            shell_path = self.shell_path.replace('{DB_NAME}',db_name)
-        else:
-            shell_path = s_path
-        print 'shell_name :',shell_name,os.path.isfile(os.path.join(shell_path, shell_name))
+    def shell_detail(self,db_name,shell_name):
+        #20220916 -- sdhyun
+        #shell_path global.
+        #pedwdb73 shell_path mod.
+        # pedwdb73
+        #   23:      def shell_detail(self,db_name,shell_name,s_path):
+        # 24:          if s_path == '':
+        # 25:              shell_path = self.shell_path.replace('{DB_NAME}',db_name)
+        # 26:          else:
+        # 27:              shell_path = s_path
+        # 28:          print 'shell_name :',shell_name,os.path.isfile(os.path.join(shell_path, shell_name))
+        # 29:
+        # 30:          with open(os.path.join(shell_path, shell_name)) as f:
+        # 31:              shell_detail = f.read()
 
-        with open(os.path.join(shell_path, shell_name)) as f:
+        self.shell_path = self.shell_path.replace('{DB_NAME}',db_name)
+        print 'shell_name :',shell_name,os.path.isfile(os.path.join(self.shell_path, shell_name))
+
+        with open(os.path.join(self.shell_path, shell_name)) as f:
             shell_detail = f.read()
         return_data = {"shell_detail": shell_detail}
         #return_data = self.hangul_dic.pprint(return_data)
@@ -61,8 +62,11 @@ prmsn
         else:
             shell_path  = self.cfg.get('common','shell_path')
 
-        shell_path = self.shell_path.replace('{DB_NAME}',db_name)
-        print shell_path
+        #20220916 sdhyun
+        #shell_path global.
+
+        self.shell_path = self.shell_path.replace('{DB_NAME}',db_name)
+        print self.shell_path
         pylist = glob.glob(os.path.join(self.shell_path, '*.sh'))
         #print pylist
         shell_list = []

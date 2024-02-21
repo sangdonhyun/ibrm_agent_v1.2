@@ -1,12 +1,3 @@
-"""
-* *******************************************************
-* Copyright (c) Fleta Communications, Inc. 2020. All Rights Reserved.
-* *******************************************************
-* create date :
-* modipy date : 2021-12-01
-"""
-__author__ = 'TODO: muse@fletacom.com'
-__ibrm_agent_version__ = 'TODO: v1.2'
 import os
 import glob
 import datetime
@@ -56,7 +47,7 @@ class clear():
 
     def main(self):
         remove_cnt=0
-        dir_list=['logs','data','log']
+        dir_list=['logs','data']
         for dir in dir_list:
             remove_cnt=remove_cnt+self.list_up(dir)
         print 'remove log :',remove_cnt

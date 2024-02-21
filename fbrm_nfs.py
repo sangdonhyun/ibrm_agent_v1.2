@@ -1,15 +1,3 @@
-'''
-"""
-* *******************************************************
-* Copyright (c) Fleta Communications, Inc. 2020. All Rights Reserved.
-* *******************************************************
-* create date :
-* modipy date : 2021-12-01
-"""
-
-__author__ = 'TODO: muse@fletacom.com'
-__ibrm_agent_version__ = 'TODO: v1.2'
-'''
 import os
 import common
 import datetime
@@ -17,8 +5,9 @@ import socketClient
 import ConfigParser
 import time
 import json
-import platform
+"""
 
+"""
 class fs():
     def __init__(self):
         self.com=common.Common
@@ -26,7 +15,6 @@ class fs():
         self.cfg = self.get_cfg()
         self.agent_ip = self.cfg.get('ibrm_agent', 'ip')
         self.check_date =datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        self.platform = platform.system()
 
     def get_cfg(self):
         cfg = ConfigParser.RawConfigParser()
@@ -66,38 +54,6 @@ class fs():
 
 
     def filesystem(self):
-
-        """
-        AIX
-        -------------------
-        Filesystem    1024-blocks      Free %Used    Iused %Iused Mounted on
-        /dev/hd4          1048576    481888   55%    12328    11% /
-
-        Linux
-        -------------------
-        [root@ibrmsv02 /]# df -k
-        Filesystem            1K-blocks      Used Available Use% Mounted on
-        /dev/mapper/vg_ibrmsv02-root
-                             1056763060  42480448 960579140   5% /
-        tmpfs                  16376184        72  16376112   1% /dev/shm
-        /dev/sdc2                194241     79086    100819  44% /boot
-        /dev/sdc1                511720       280    511440   1% /boot/efi
-        /dev/mapper/vg_ibrmsv02-u01
-                             1056763060 691058948 312000640  69% /u01
-        ZFS_VM:/export/BAK_ORCL_01
-                                9960448   3145728   6814720  32% /ZFS/BACKUP/DATA_ORCL_01
-        ZFS_VM:/export/BAK_ORCL_02
-                                8119296   1444864   6674432  18% /ZFS/BACKUP/DATA_ORCL_02
-        ZFS_VM:/export/ARC_ORCL_01
-                                8061952   1247232   6814720  16% /ZFS/BACKUP/ARCH_ORCL_01
-        ZFS_VM:/export/ARC_ORCL_02
-                                7114752    440320   6674432   7% /ZFS/BACKUP/ARCH_ORCL_02
-
-
-
-        :return:
-        """
-
         data=os.popen('df -k').read()
         lineset=data.splitlines()
         arg_list=[]
@@ -108,28 +64,19 @@ class fs():
             arg_set = line.split()
             if len(arg_set) == 1:
                 arg_list.append(arg_set + lineset[i+1].split())
-            if len(arg_set) >= 6:
+            if len(arg_set) == 6:
                 arg_list.append(arg_set)
-
 
         nfs_list=[]
         for arg_set in arg_list:
-            if self.platform == 'AIX':
-                if not  (arg_set[0] == 'Filesystem' or arg_set[1] == '-'):
-                    print arg_set
-                    arg_set[0]
-                    tot = float(arg_set[1])
-                    free = float(arg_set[2])
-                    used = tot - free
-                    used_rate = round(used / free * 100)
-                    arg_set = [arg_set[0], arg_set[1],used,free,used_rate,arg_set[-1]]
-                    nfs = dict()
-                    for i in range(len(arg_set)):
-                        arg = arg_set[i]
-                        nfs[title[i]] = arg
-                    mounted_bit = self.get_mounted_bit(nfs['Mounted_on'])
-                    nfs['mounted_bit'] = str(mounted_bit)
-                    nfs_list.append(nfs)
+
+            nfs = dict()
+            for i in range(len(arg_set)):
+                arg = arg_set[i]
+                nfs[title[i]] = arg
+            mounted_bit = self.get_mounted_bit(nfs['Mounted_on'])
+            nfs['mounted_bit'] = str(mounted_bit)
+            nfs_list.append(nfs)
         return nfs_list
 
     def get_mounted_bit(self,fs):
@@ -161,32 +108,34 @@ class fs():
 
         return ip_list
 
-
     def main(self):
 
         nfs_info = dict()
         json_data = ""
+        try:
+            fs_ret=self.filesystem()
+            # print ret
+            nfs_info['hostname'] = self.hostname
+            cmd ="""grep `hostname` /etc/hosts | awk '{print $1}' """
+            nfs_info['ip'] = os.popen(cmd).read().strip().split()[0]
 
-        fs_ret=self.filesystem()
-        # print ret
-        nfs_info['hostname'] = self.hostname
-        cmd ="""grep `hostname` /etc/hosts | awk '{print $1}' """
-        nfs_info['ip'] = os.popen(cmd).read().strip().split()[0]
+            nfs_info['datetime'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            nfs_info['filesystem'] = fs_ret
 
-        nfs_info['datetime'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        nfs_info['filesystem'] = fs_ret
+            ip_ret = self.get_hosts()
+            nfs_info['hosts'] = ip_ret
+            json_data=json.dumps(nfs_info)
+            print json_data
 
-        ip_ret = self.get_hosts()
-        nfs_info['hosts'] = ip_ret
-        json_data=json.dumps(nfs_info)
-        print json_data
-        date_str = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-        fname = os.path.join('data','{}_nfs_{}.json'.format(self.hostname,date_str))
-        with open(fname,'w') as f:
-            f.write(json_data)
-        socketClient.SocketSender(FILENAME=fname, DIR='FBRM_NFS', ENDCHECK='NO').main()
-        # os.remove(fname)
 
+            date_str = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+            fname = os.path.join('data','{}_nfs_{}.json'.format(self.hostname,date_str))
+            with open(fname,'w') as f:
+                f.write(json_data)
+            socketClient.SocketSender(FILENAME=fname, DIR='FBRM_NFS', ENDCHECK='NO').main()
+            # os.remove(fname)
+        except :
+            pass
         return json_data
 
 if __name__ =='__main__':

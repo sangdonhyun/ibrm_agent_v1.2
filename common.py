@@ -1,14 +1,12 @@
 '''
-"""
-* *******************************************************
-* Copyright (c) Fleta Communications, Inc. 2020. All Rights Reserved.
-* *******************************************************
-* create date :
-* modipy date : 2021-12-01
-"""
+Created on 2012. 10. 12.
 
-__author__ = 'TODO: muse@fletacom.com'
-__ibrm_agent_version__ = 'TODO: v1.2'
+@author: Administrator
+'''
+'''
+Created on 2012. 9. 27.
+
+@author: Administrator
 '''
 import sys
 import os
@@ -99,7 +97,15 @@ class Decode():
 class Common():
     def __init__(self):
         self.cfg = self.getCfg()
-
+        self.s_agent_path = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])))
+        self.s_sql_path = os.path.join(self.s_agent_path, 'sql')
+        
+        if os.path.isdir(self.s_sql_path) :
+            if oct(os.stat(self.s_sql_path).st_mode)[-3:] != '707':
+                os.chmod(self.s_sql_path, 0o0707)
+        
+    def exec_command(self, s_commmand):
+        return os.popen(s_commmand).read().strip()
 
     def ora_list_cfg(self):
         cfg = ConfigParser.RawConfigParser()
@@ -112,15 +118,18 @@ class Common():
         try:
             ora_cfg=self.ora_list_cfg()
             ora_home = ora_cfg.get(ora_sid,'ORACLE_HOME')
-        except:
+            print(ora_home)
+        except Exception as e:
+            print('EEEEEEEEEEEEEEE')
+            print(str(e))
+            print('EEEEEEEEEEEEEEE')
             pass
         return ora_home
 
     def ora_home_str(self):
         return self.cfg.get('common','ora_home_str')
+    
     def getCfg(self):
-        
-
         config = ConfigParser.RawConfigParser()
         cfgFile = os.path.join('config','config.cfg')
         config.read(cfgFile)
@@ -142,7 +151,7 @@ class Common():
         msg += '#### '+' '*71+'###\n'
         msg += '#'*79+'\n'
         return msg
-    
+
     def getEndMsg(self):
         now = self.getNow()
         msg = '\n'
@@ -151,7 +160,11 @@ class Common():
         msg += '#'*79+'\n'
         return msg
 
-    
+    def get_cfg(self):
+        cfg = ConfigParser.RawConfigParser()
+        cfg_file = os.path.join('config', 'config.cfg')
+        cfg.read(cfg_file)
+        return cfg
 
 if __name__=='__main__':
 #    logTest()

@@ -28,9 +28,6 @@ class SocketSender():
         self.socket_send(data)
 
     def shell_detail(self):
-
-        HOST, PORT = "121.170.193.196", 53001
-
         data = {}
         data['FLETA_PASS'] = 'kes2719!'
         data['CMD'] = 'JOB_STATUS'
@@ -50,19 +47,10 @@ class SocketSender():
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             # Connect to server and send data
             sock.connect((self.HOST, self.PORT))
-            sock.sendall(str(data) + "\n")
-
+            sock.sendall(str(data))
             # Receive data from the server and shut down
             received = sock.recv(1024)
-            print 'recv :', received
-            # if received == 'READY':
-            #     cmd = 'agent_shell_list'
-            #     sock.sendall(cmd)
-            print 'ok'
-
-            # recv_data=sock.recv(1024)
-            # print 'recv_data :',recv_data
-
+          
             sBit = True
         except socket.error as e:
             sBit = False
@@ -95,18 +83,15 @@ class SocketSender():
         self.socket_send(data)
 
 
-    # def job_monitor (self,job_data):
-    #     data = {}
-    #     data['FLETA_PASS'] = 'kes2719!'
-    #     data['CMD'] = 'JOB_MONITOR'
-    #     data['ARG'] = {}
-    #     data['ARG'] = job_data
-    #     print data
-    #     self.socket_send(data)
+    def job_monitor (self,job_data):
+         data = {}
+         data['FLETA_PASS'] = 'kes2719!'
+         data['CMD'] = 'JOB_MONITOR'
+         data['ARG'] = {}
+         data['ARG'] = job_data
+         self.socket_send(data)
 
-
-
-    def submit_fial(self,job_data):
+    def submit_fail(self,job_data):
         data = {}
         data['FLETA_PASS'] = 'kes2719!'
         data['CMD'] = 'JOB_SUBMIT_FAIL'
@@ -124,8 +109,6 @@ class SocketSender():
         data['ARG'] = log_data
         self.socket_send(data)
 
-
-
     def job_error(self,job_status):
         pass
 
@@ -138,7 +121,7 @@ class SocketSender():
         print job_status
         self.socket_send(data)
 
-    def job_submit_fial(self,job_status):
+    def job_submit_fail(self,job_status):
         data = {}
         data['FLETA_PASS'] = 'kes2719!'
         data['CMD'] = 'JOB_SUBMIT_FAIL'
@@ -146,8 +129,6 @@ class SocketSender():
         data['ARG'] = job_status
         print job_status
         self.socket_send(data)
-
-
 
     def job_status_shell_only(self,job_status):
         data = {}
@@ -174,12 +155,12 @@ class SocketSender():
         data['ARG'] = {}
         data['ARG']['job_id'] = job_id
         job_status = self.socket_send(data)
-        job_status = job_status.replace("'",'"')
-        print type(job_status)
-        json_data = json.loads(job_status)
+        rman_tag = ''
+        if job_status != '':
+            job_status = job_status.replace("'",'"')
+            json_data = json.loads(job_status)
         # json_data = literal_eval(job_status)
-        rman_tag = json_data['ARG']['rman_tag']
-        print rman_tag
+            rman_tag = json_data['ARG']['rman_tag']
         return rman_tag
 
     def rman_progress(self,job_status):
@@ -189,12 +170,31 @@ class SocketSender():
         data['ARG'] = {}
         data['ARG'] = job_status
         self.socket_send(data)
+        
+    def job_set_monitor(self, job_status):
+        data = {}
+        data['FLETA_PASS'] = 'kes2719!'
+        data['CMD'] = 'JOB_SET_MONITOR'
+        data['ARG'] = {}
+        data['ARG'] = job_status
+        
+        self.socket_send(data)
+        
+    def job_get_monitor(self, a_arg):
+        data = {}
+        data['FLETA_PASS'] = 'kes2719!'
+        data['CMD'] = 'JOB_GET_MONITOR'
+        data['ARG'] = {}
+        data['ARG'] = a_arg
+        s_monitor_status = self.socket_send('', data)
+        s_monitor_status = s_monitor_status.replace("'",'"')
+        a_monitor_status = json.loads(s_monitor_status)
+        return a_monitor_status
+    
+    def agent_info(self, a_agent_info):
+        self.socket_send(a_agent_info)
 
     def send(self):
-
-        HOST, PORT = "121.170.193.196", 53001
-
-
         data={}
         data['FLETA_PASS'] = 'kes2719!'
         data['CMD'] = 'AGENT_JOB_EXCUTE'
@@ -214,19 +214,6 @@ class SocketSender():
             sock.connect((HOST, PORT))
             sock.sendall(str(data) + "\n")
 
-            # Receive data from the server and shut down
-            received = sock.recv(1024)
-            print 'recv :',received
-            # if received == 'READY':
-            #     cmd = 'agent_shell_list'
-            #     sock.sendall(cmd)
-            print 'ok'
-
-            # recv_data=sock.recv(1024)
-            # print 'recv_data :',recv_data
-
-
-
             sBit = True
         except socket.error as e:
             sBit = False
@@ -240,46 +227,6 @@ class SocketSender():
 
         sBit = self.send()
         print 'sBit' , sBit
-
-if __name__ == '__main__':
-
-    HOST='121.170.193.207'
-    PORT=53002
-
-#    job_status={'status': 'RUNNING', 'input_type': 'DB INCR', 'start_time': '2020-11-02 16:44:29', 'session_id': '4384', 'elapsed_seconds': '42', 'end_time': '2020-11-02 16:45:11', 'write_bps': '23.62M'}
-#    shell_name = 'IBRM_Incr_Level0.sh'
-#    job_fail_info = {}
-#    job_fail_info['job_id'] = '13'
-#    job_fail_info['tg_job_dtl_id'] = '177'
-#    job_fail_info['memo'] = '{} job is allready running'.format(shell_name)
-
-    #job_status =  {'status': 'RUNNING', 'job_id': 52, 'input_type': 'DB INCR', 'start_time': '2020-11-09 19:50:30', 'tg_job_dtl_id': 195, 'pid': '27895', 'session_id': '2272', 'elapsed_seconds': '5', 'end_time': '2020-11-09 19:50:35', 'job_st': 'Running', 'write_bps': '88.80M', 'session_stamp': '1056052228', 'ora_sid': 'ibrm', 'session_recid': '2272'}
-    #SocketSender(HOST,PORT).job_status(job_status)
-
-
-    """
-    ibrm 8517 3743 37 IBRM_Incr_Level1_Weekly.sh INCR IBRM "2020-11-19 09:15:22" 554
-    """
-
-    monitor_info= {}
-
-    monitor_info['ora_sid'] = 'ibrm'
-    monitor_info['pid'] = '8517'
-    monitor_info['session_id'] = '3743'
-    monitor_info['job_id'] = '37'
-    monitor_info['shell_name'] = 'IBRM_Incr_Level1_Weekly'
-    monitor_info['shell_type'] = 'INCR'
-    monitor_info['db_name'] = 'IBRM'
-    monitor_info['sys_date_str'] = "2020-11-19 09:15:22"
-    monitor_info['tg_job_dtl_id'] = '554'
-
-    job_check={'memo': 'this job (IBRM_Archive.sh)  is already running', 'job_id': 71, 'tg_job_dtl_id': 577}
-    job_check={'end_time': '', 'start_time': '20201211200223', 'tg_job_dtl_id': '201836', 'job_id': '93', 'job_st': 'Running'}
-    job_check={'job_id': 119, 'start_time': '20201213171022', 'job_st': 'End-OK', 'pid': 3954, 'elapsed_seconds': 60, 'end_time': '20201213171122', 'tg_job_dtl_id': 201988}
-    #SocketSender(HOST,PORT).job_status_shell_only(job_check)
-    job_id=monitor_info['job_id']
-    SocketSender(HOST, PORT).get_rman_tag(job_id)
-#    SocketSender(HOST,PORT).job_status(job_check)
 
 
 

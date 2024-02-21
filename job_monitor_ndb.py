@@ -96,11 +96,7 @@ class job_mon():
         self.socket_server.job_status_shell_only(data)
 
         returncode, std_out, std_err,pid =self.runcommand()
-        print '-'*50
-        print self.cmd
-        print 'return code : ',returncode,returncode ==0
-        print 'pid : ',pid
-        print os.popen('ps -ef | grep {}'.format(pid)).read()
+       
 
 
         if returncode ==0:
@@ -115,7 +111,6 @@ class job_mon():
 
         data['pid'] = pid
         data['job_id'] = self.job_id
-
         data['job_st'] = self.job_st
         data['tg_job_dtl_id'] = self.tg_job_dtl_id
         data['elapsed_seconds'] = int(elapsed_seconds)
@@ -133,7 +128,7 @@ if __name__=='__main__':
     shell_type = arg[4]
     db_name = arg[5]
     tg_job_dtl_id = arg[6]
-    cmd = """su - oracle -c "sh /u01/SCRIPTS/Database/ORCL/RMAN/SCHEDULE/ORCL_Arch_snapshot.sh"
+    cmd = """/bin/su - oracle -c "sh /u01/SCRIPTS/Database/ORCL/RMAN/SCHEDULE/ORCL_Arch_snapshot.sh"
     """
     job_id = "219"
     shell_name = "ORCL_Arch_snapshot.sh"
